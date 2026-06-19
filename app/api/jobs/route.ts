@@ -20,6 +20,7 @@ export async function POST(request: Request) {
             position: body.position,
             location: body.location,
             salary: body.salary,
+            jobUrl: body.jobUrl,
             notes: body.notes,
         },
     });
