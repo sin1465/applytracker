@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import AddJobForm from "./components/AddJobForm";
 import DeleteJobButton from "./components/DeleteJobButton";
+import StatusSelect from "./components/StatusSelect";
 
 type Job = {
     id: string;
@@ -34,7 +35,7 @@ export default async function Home() {
                             <h3 className="font-bold text-lg">{job.position}</h3>
                             <p>{job.company}</p>
                             <p>{job.location ?? "No location specified"}</p>
-                            <p>Status: {job.status}</p>
+                            <StatusSelect id={job.id} status={job.status} />
 
                             <DeleteJobButton id={job.id} />
                         </div>
