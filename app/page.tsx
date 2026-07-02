@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import AddJobForm from "./components/AddJobForm";
 import DeleteJobButton from "./components/DeleteJobButton";
 import StatusSelect from "./components/StatusSelect";
+import StatusFilter from "./components/StatusFilter";
 
 type Job = {
     id: string;
@@ -11,8 +12,16 @@ type Job = {
     status: string;
 };
 
-export default async function Home() {
+export default async function Home({ searchParams, }: { searchParams: Promise<{ status?: string }>;}) {
+    const { status } = await searchParams;
+
     const jobs = await prisma.jobApplication.findMany({
+        where:
+            status && status !== "ALL"
+                ? { 
+                    status: status as any,  // select * where status 
+                } 
+                : undefined,    // select * 
         orderBy: {
             createdAt: "desc",
         },
@@ -25,6 +34,8 @@ export default async function Home() {
             <AddJobForm />
 
             <h2 className="text-2xl font-semibold mb-4">Job Applications</h2>
+
+            <StatusFilter currentStatus={status} />
 
             {jobs.length === 0 ? (
                 <p>No job applications yet.</p>
