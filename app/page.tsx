@@ -3,6 +3,7 @@ import AddJobForm from "./components/AddJobForm";
 import DeleteJobButton from "./components/DeleteJobButton";
 import StatusSelect from "./components/StatusSelect";
 import StatusFilter from "./components/StatusFilter";
+import DashboardStats from "./components/DashboardStats";
 
 type Job = {
     id: string;
@@ -15,21 +16,51 @@ type Job = {
 export default async function Home({ searchParams, }: { searchParams: Promise<{ status?: string }>;}) {
     const { status } = await searchParams;
 
-    const jobs = await prisma.jobApplication.findMany({
-        where:
-            status && status !== "ALL"
-                ? { 
-                    status: status as any,  // select * where status 
-                } 
-                : undefined,    // select * 
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
+    const [jobs, totalCount, interviewCount, offerCount, rejectedCount] = 
+        await Promise.all([
+            prisma.jobApplication.findMany({
+                where:
+                    status && status !== "ALL"
+                        ? { 
+                            status: status as any,  // select * where status 
+                        } 
+                        : undefined,    // select * 
+                orderBy: {
+                    createdAt: "desc",
+                },
+            }),
+
+            prisma.jobApplication.count(),
+
+            prisma.jobApplication.count({
+                where: {
+                    status: "INTERVIEW",
+                },
+            }),
+
+            prisma.jobApplication.count({
+                where: {
+                    status: "OFFER",
+                },
+            }),
+
+            prisma.jobApplication.count({
+                where: {
+                    status: "REJECTED",
+                },
+            }),
+        ]);
 
     return (
         <main className="max-w-4xl mx-auto p-8">
             <h1 className="text-4xl font-bold mb-8">ApplyTrackr</h1>
+
+            <DashboardStats 
+                total={totalCount}
+                interviews={interviewCount}
+                offers={offerCount}
+                rejected={rejectedCount}
+            />
 
             <AddJobForm />
 
