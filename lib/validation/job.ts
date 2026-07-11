@@ -36,11 +36,11 @@ export const createJobSchema = z.object({
         .optional(),
 
     jobUrl: z
-        .string()
-        .trim()
-        .url("Job URL must be valid")
-        .optional()
-        .or(z.literal("")),
+        .union([
+            z.url("Job URL must be valid"),
+            z.literal(""),
+        ])
+        .optional(),
 
     notes: z
         .string()

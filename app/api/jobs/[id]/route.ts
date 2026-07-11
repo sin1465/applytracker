@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { updateJobStatusSchema } from "@/lib/validation/job";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 type RouteParams = {
     params: Promise<{
@@ -38,7 +39,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
             return NextResponse.json(
                 {
                     error: "Invalid status",
-                    details: result.error.flatten().fieldErrors,
+                    details: z.flattenError(result.error).fieldErrors,
                 },
                 { status: 400 }
             );

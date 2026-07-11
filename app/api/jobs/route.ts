@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createJobSchema } from "@/lib/validation/job";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function GET() {
     try {
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     error: "Invalid job application data",
-                    details: result.error.flatten().fieldErrors,
+                    details: z.flattenError(result.error).fieldErrors,
                 },
                 { status: 400 }
             );
