@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { updateJobStatusSchema } from "@/lib/validation/job";
 import { NextResponse } from "next/server";
 
 type RouteParams = {
@@ -7,26 +8,56 @@ type RouteParams = {
     }>;
 };
 
-export async function DELETE(request: Request, { params }: RouteParams) {
-    const { id } = await params;
+export async function DELETE(_request: Request, { params }: RouteParams) {
+    try {
+        const { id } = await params;
 
-    await prisma.jobApplication.delete({
-        where: { id },
-    });
+        await prisma.jobApplication.delete({
+            where: { id },
+        });
 
-    return NextResponse.json({ message: "Job deleted" });
+        return NextResponse.json({ message: "Job application deleted", });
+    } catch (error) {
+        console.error("Failed to delete job:", error);
+
+        return NextResponse.json(
+            { error: "Failed to delete job application" },
+            { status: 500 }
+        );
+    }
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-    const { id } = await params;
-    const body = await request.json();
+    try {
+        const { id } = await params;
+        const body: unknown = await request.json();
 
-    const updatedJob = await prisma.jobApplication.update({
-        where: { id },
-        data: {
-            status: body.status,
-        },
-    });
+        const result = updateJobStatusSchema.safeParse(body);
 
-    return NextResponse.json(updatedJob);
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    error: "Invalid status",
+                    details: result.error.flatten().fieldErrors,
+                },
+                { status: 400 }
+            );
+        }
+
+        const updatedJob = await prisma.jobApplication.update({
+            where: { id },
+            data: {
+                status: result.data.status,
+            },
+        });
+
+        return NextResponse.json(updatedJob);
+    } catch (error) {
+        console.error("Failed to update job:", error);
+
+        return NextResponse.json(
+            { error: "Failed to update job application" },
+            { status: 500 }
+        );
+    }
 }

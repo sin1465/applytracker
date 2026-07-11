@@ -4,6 +4,7 @@ import DeleteJobButton from "./components/DeleteJobButton";
 import StatusSelect from "./components/StatusSelect";
 import StatusFilter from "./components/StatusFilter";
 import DashboardStats from "./components/DashboardStats";
+import { jobStatusSchema } from "@/lib/validation/job";
 
 type Job = {
     id: string;
@@ -16,15 +17,20 @@ type Job = {
 export default async function Home({ searchParams, }: { searchParams: Promise<{ status?: string }>;}) {
     const { status } = await searchParams;
 
+    const statusResult = jobStatusSchema.safeParse(status);
+
+    const selectedStatus = statusResult.success
+        ? statusResult.data
+        : undefined;
+
     const [jobs, totalCount, interviewCount, offerCount, rejectedCount] = 
         await Promise.all([
             prisma.jobApplication.findMany({
-                where:
-                    status && status !== "ALL"
-                        ? { 
-                            status: status as any,  // select * where status 
-                        } 
-                        : undefined,    // select * 
+                where: selectedStatus
+                    ? { 
+                        status: selectedStatus,  // select * where status 
+                    } 
+                    : undefined,    // select * 
                 orderBy: {
                     createdAt: "desc",
                 },
@@ -33,21 +39,15 @@ export default async function Home({ searchParams, }: { searchParams: Promise<{ 
             prisma.jobApplication.count(),
 
             prisma.jobApplication.count({
-                where: {
-                    status: "INTERVIEW",
-                },
+                where: { status: "INTERVIEW" },
             }),
 
             prisma.jobApplication.count({
-                where: {
-                    status: "OFFER",
-                },
+                where: { status: "OFFER" },
             }),
 
             prisma.jobApplication.count({
-                where: {
-                    status: "REJECTED",
-                },
+                where: { status: "REJECTED" },
             }),
         ]);
 
@@ -66,7 +66,7 @@ export default async function Home({ searchParams, }: { searchParams: Promise<{ 
 
             <h2 className="text-2xl font-semibold mb-4">Job Applications</h2>
 
-            <StatusFilter currentStatus={status} />
+            <StatusFilter currentStatus={selectedStatus} />
 
             {jobs.length === 0 ? (
                 <p>No job applications yet.</p>

@@ -1,31 +1,62 @@
 import { prisma } from "@/lib/prisma";
+import { createJobSchema } from "@/lib/validation/job";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const jobs = await prisma.jobApplication.findMany({
-        orderBy: {
-            createdAt: "desc",  // newest jobs appear first
-        },
-    });
+    try {
+        const jobs = await prisma.jobApplication.findMany({
+            orderBy: {
+                createdAt: "desc",  // newest jobs appear first
+            },
+        });
 
-    return NextResponse.json(jobs);
+        return NextResponse.json(jobs);
+    } catch (error) {
+        console.error("Failed to retrieve jobs:", error);
+
+        return NextResponse.json(
+            { error: "Failed to retrieve job applications" },
+            { status: 500 }
+        );
+    }    
 }
 
 export async function POST(request: Request) {
-    const body = await request.json();
+    try {
+        const body: unknown = await request.json();
+        const result = createJobSchema.safeParse(body);
 
-    const job = await prisma.jobApplication.create({
-        data: {
-            company: body.company,
-            position: body.position,
-            location: body.location,
-            salary: body.salary,
-            jobUrl: body.jobUrl,
-            notes: body.notes,
-        },
-    });
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    error: "Invalid job application data",
+                    details: result.error.flatten().fieldErrors,
+                },
+                { status: 400 }
+            );
+        }
 
-    return NextResponse.json(job, {
-        status: 201,
-    });
+        const data = result.data;
+
+        const job = await prisma.jobApplication.create({
+            data: {
+                company: data.company,
+                position: data.position,
+                location: data.location || null,
+                salary: data.salary || null,
+                jobUrl: data.jobUrl || null,
+                notes: data.notes || null,
+                status: data.status ?? "SAVED",
+            },
+        });
+
+        return NextResponse.json(job, { status: 201 });
+    } catch (error) {
+        console.error("Failed to create job:", error);
+
+        return NextResponse.json(
+            { error: "Failed to create job application" },
+            { status: 500 }
+        );
+    }
 }
