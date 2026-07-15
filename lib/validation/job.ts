@@ -55,4 +55,6 @@ export const updateJobStatusSchema = z.object({
     status: jobStatusSchema,
 });
 
+export const updateJobSchema = createJobSchema;
+
 export type JobStatus = z.infer<typeof jobStatusSchema>;

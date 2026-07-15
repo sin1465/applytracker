@@ -1,17 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import AddJobForm from "./components/AddJobForm";
+import EditJobForm from "./components/EditJobForm";
 import DeleteJobButton from "./components/DeleteJobButton";
 import StatusSelect from "./components/StatusSelect";
 import StatusFilter from "./components/StatusFilter";
 import DashboardStats from "./components/DashboardStats";
 import { jobStatusSchema } from "@/lib/validation/job";
+import type { JobStatus } from "@/lib/validation/job";
 
 type Job = {
     id: string;
     company: string;
     position: string;
     location: string | null;
-    status: string;
+    salary: string | null;
+    jobUrl: string | null;
+    notes: string | null;
+    status: JobStatus;
 };
 
 export default async function Home({ searchParams, }: { searchParams: Promise<{ status?: string }>;}) {
@@ -77,9 +82,28 @@ export default async function Home({ searchParams, }: { searchParams: Promise<{ 
                             <h3 className="font-bold text-lg">{job.position}</h3>
                             <p>{job.company}</p>
                             <p>{job.location ?? "No location specified"}</p>
+
+                            {job.salary && <p>Salary: {job.salary}</p>}
+
+                            {job.jobUrl && (
+                                <a
+                                    href={job.jobUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 underline"
+                                >
+                                    View job posting
+                                </a>
+                            )}
+
+                            {job.notes && <p className="mt-2">{job.notes}</p>}
+
                             <StatusSelect id={job.id} status={job.status} />
 
-                            <DeleteJobButton id={job.id} />
+                            <div className="flex gap-2">
+                                <EditJobForm job={job} />
+                                <DeleteJobButton id={job.id} />
+                            </div>
                         </div>
                     ))}
                 </div>

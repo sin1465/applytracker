@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { updateJobStatusSchema } from "@/lib/validation/job";
+import { updateJobSchema, updateJobStatusSchema } from "@/lib/validation/job";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -33,22 +33,45 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         const { id } = await params;
         const body: unknown = await request.json();
 
-        const result = updateJobStatusSchema.safeParse(body);
+        // The status dropdown sends only { status }.
+        const statusResult = updateJobStatusSchema.safeParse(body);
 
-        if (!result.success) {
+        if (statusResult.success && Object.keys(body as object).length === 1) {
+            const updatedJob = await prisma.jobApplication.update({
+                where: { id },
+                data: {
+                    status: statusResult.data.status,
+                },
+            });
+
+            return NextResponse.json(updatedJob);
+        }
+
+        // The complete edit form sends all job fields.
+        const jobResult = updateJobSchema.safeParse(body);
+
+        if (!jobResult.success) {
             return NextResponse.json(
                 {
-                    error: "Invalid status",
-                    details: z.flattenError(result.error).fieldErrors,
+                    error: "Invalid job application data",
+                    details: z.flattenError(jobResult.error).fieldErrors,
                 },
                 { status: 400 }
             );
         }
 
+        const data = jobResult.data;
+
         const updatedJob = await prisma.jobApplication.update({
             where: { id },
             data: {
-                status: result.data.status,
+                company: data.company,
+                position: data.position,
+                location: data.location || null,
+                salary: data.salary || null,
+                jobUrl: data.jobUrl || null,
+                notes: data.notes || null,
+                status: data.status ?? "SAVED",
             },
         });
 
