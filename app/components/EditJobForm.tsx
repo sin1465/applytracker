@@ -2,26 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { JobStatus } from "@/lib/validation/job";
-
-const statuses: JobStatus[] = [
-    "SAVED",
-    "APPLIED",
-    "INTERVIEW",
-    "REJECTED",
-    "OFFER",
-];
-
-type Job = {
-    id: string;
-    company: string;
-    position: string;
-    location: string | null;
-    salary: string | null;
-    jobUrl: string | null;
-    notes: string | null;
-    status: JobStatus;
-};
+import { JOB_STATUSES } from "@/lib/constants/jobConstants";
+import type { JobStatus, Job } from "@/lib/types/jobTypes";
 
 type EditJobFormProps = {
     job: Job;
@@ -64,7 +46,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
         setIsEditing(false);
     }
 
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
         setIsSubmitting(true);
@@ -78,6 +60,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    action: "update-job",
                     company,
                     position,
                     location,
@@ -239,7 +222,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
                     className="w-full rounded border p-2"
                     disabled={isSubmitting}
                 >
-                    {statuses.map((statusOption) => (
+                    {JOB_STATUSES.map((statusOption) => (
                         <option key={statusOption} value={statusOption}>
                             {statusOption}
                         </option>

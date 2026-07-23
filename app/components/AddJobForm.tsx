@@ -2,15 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { JobStatus } from "@/lib/validation/job";
-
-const statuses: JobStatus[] = [
-    "SAVED",
-    "APPLIED",
-    "INTERVIEW",
-    "REJECTED",
-    "OFFER",
-];
+import { JOB_STATUSES } from "@/lib/constants/jobConstants";
+import type { JobStatus } from "@/lib/types/jobTypes";
 
 type FieldErrors = Record<string, string[] | undefined>;
 
@@ -35,7 +28,7 @@ export default function AddJobForm() {
     const [successMessage, setSuccessMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
         setIsSubmitting(true);
@@ -226,7 +219,7 @@ export default function AddJobForm() {
                     onChange={(event) => setStatus(event.target.value as JobStatus)}
                     disabled={isSubmitting}
                 >
-                    {statuses.map((statusOption) => (
+                    {JOB_STATUSES.map((statusOption) => (
                         <option key={statusOption} value={statusOption}>
                             {statusOption}
                         </option>

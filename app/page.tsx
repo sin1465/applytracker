@@ -5,19 +5,8 @@ import DeleteJobButton from "./components/DeleteJobButton";
 import StatusSelect from "./components/StatusSelect";
 import StatusFilter from "./components/StatusFilter";
 import DashboardStats from "./components/DashboardStats";
-import { jobStatusSchema } from "@/lib/validation/job";
-import type { JobStatus } from "@/lib/validation/job";
-
-type Job = {
-    id: string;
-    company: string;
-    position: string;
-    location: string | null;
-    salary: string | null;
-    jobUrl: string | null;
-    notes: string | null;
-    status: JobStatus;
-};
+import { jobStatusSchema } from "@/lib/validation/jobSchemas";
+import type { Job } from "@/lib/types/jobTypes";
 
 export default async function Home({ searchParams, }: { searchParams: Promise<{ status?: string }>;}) {
     const { status } = await searchParams;

@@ -1,27 +1,33 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { JOB_STATUSES } from "@/lib/constants/jobConstants";
+import type { JobStatus } from "@/lib/types/jobTypes";
 
 type StatusSelectProps = {
     id: string;
-    status: string;
+    status: JobStatus;
 };
-
-const statuses = ["SAVED", "APPLIED", "INTERVIEW", "REJECTED", "OFFER"];
 
 export default function StatusSelect({ id, status }: StatusSelectProps) {
     const router = useRouter();
 
     async function handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        await fetch(`/api/jobs/${id}`, {
+        const response = await fetch(`/api/jobs/${id}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
+                action: "update-status",
                 status: event.target.value,
             }),
         });
+
+        if (!response.ok) {
+            console.error("Failed to update job stattus");
+            return;
+        }
 
         router.refresh();
     }
@@ -32,7 +38,7 @@ export default function StatusSelect({ id, status }: StatusSelectProps) {
             onChange={handleChange}
             className="mt-3 rounded border p-2"
         >
-            {statuses.map((statusOption) => (
+            {JOB_STATUSES.map((statusOption) => (
                 <option key={statusOption} value={statusOption}>
                     {statusOption}
                 </option>

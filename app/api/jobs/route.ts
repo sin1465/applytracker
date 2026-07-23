@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { createJobSchema } from "@/lib/validation/job";
+import { createJobSchema } from "@/lib/validation/jobSchemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 

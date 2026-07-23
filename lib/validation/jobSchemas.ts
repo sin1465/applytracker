@@ -1,12 +1,5 @@
 import { z } from "zod";
-
-export const JOB_STATUSES = [
-    "SAVED",
-    "APPLIED",
-    "INTERVIEW",
-    "REJECTED",
-    "OFFER",
-] as const;
+import { JOB_STATUSES } from "../constants/jobConstants";
 
 export const jobStatusSchema = z.enum(JOB_STATUSES);
 
@@ -51,10 +44,11 @@ export const createJobSchema = z.object({
     status: jobStatusSchema.optional(),
 });
 
-export const updateJobStatusSchema = z.object({
+export const updateStatusRequestSchema = z.object({
+    action: z.literal("update-status"),
     status: jobStatusSchema,
 });
 
-export const updateJobSchema = createJobSchema;
-
-export type JobStatus = z.infer<typeof jobStatusSchema>;
+export const updateJobRequestSchema = createJobSchema.extend({
+    action: z.literal("update-job"),
+});

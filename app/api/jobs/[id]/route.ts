@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { updateJobSchema, updateJobStatusSchema } from "@/lib/validation/job";
+import { updateJobRequestSchema, updateStatusRequestSchema } from "@/lib/validation/jobSchemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -34,9 +34,9 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         const body: unknown = await request.json();
 
         // The status dropdown sends only { status }.
-        const statusResult = updateJobStatusSchema.safeParse(body);
+        const statusResult = updateStatusRequestSchema.safeParse(body);
 
-        if (statusResult.success && Object.keys(body as object).length === 1) {
+        if (statusResult.success) {
             const updatedJob = await prisma.jobApplication.update({
                 where: { id },
                 data: {
@@ -48,7 +48,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         }
 
         // The complete edit form sends all job fields.
-        const jobResult = updateJobSchema.safeParse(body);
+        const jobResult = updateJobRequestSchema.safeParse(body);
 
         if (!jobResult.success) {
             return NextResponse.json(
