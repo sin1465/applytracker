@@ -10,3 +10,10 @@ export const JOB_FILTERS = [
     "ALL",
     ...JOB_STATUSES,
 ] as const;
+
+export const JOB_SORT_OPTIONS = [
+    "newest",
+    "oldest",
+    "company-asc",
+    "company-desc",
+] as const;

@@ -1,8 +1,10 @@
-import type { JOB_FILTERS, JOB_STATUSES } from "@/lib/constants/jobConstants";
+import type { JOB_FILTERS, JOB_STATUSES, JOB_SORT_OPTIONS } from "@/lib/constants/jobConstants";
 
 export type JobStatus = (typeof JOB_STATUSES)[number];
 
 export type JobFilter = (typeof JOB_FILTERS)[number];
+
+export type JobSortOption = (typeof JOB_SORT_OPTIONS)[number];
 
 export type Job = {
     id: string;

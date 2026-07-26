@@ -5,29 +5,73 @@ import DeleteJobButton from "./components/DeleteJobButton";
 import StatusSelect from "./components/StatusSelect";
 import StatusFilter from "./components/StatusFilter";
 import DashboardStats from "./components/DashboardStats";
+import JobSearchControls from "./components/JobSearchControls";
+
+import { JOB_SORT_OPTIONS } from "@/lib/constants/jobConstants";
 import { jobStatusSchema } from "@/lib/validation/jobSchemas";
-import type { Job } from "@/lib/types/jobTypes";
+import type { Job, JobSortOption } from "@/lib/types/jobTypes";
 
-export default async function Home({ searchParams, }: { searchParams: Promise<{ status?: string }>;}) {
-    const { status } = await searchParams;
+type HomeSearchParams = {
+    status?: string;
+    search?: string;
+    sort?: string;
+};
 
-    const statusResult = jobStatusSchema.safeParse(status);
+export default async function Home({ searchParams, }: { searchParams: Promise<HomeSearchParams>;}) {
+    const params = await searchParams;
+
+    const statusResult = jobStatusSchema.safeParse(params.status);
 
     const selectedStatus = statusResult.success
         ? statusResult.data
         : undefined;
 
+    const search = params.search?.trim() || undefined;
+
+    const selectedSort: JobSortOption =
+        JOB_SORT_OPTIONS.includes(params.sort as JobSortOption)
+            ? (params.sort as JobSortOption)
+            : "newest";
+
+    const orderBy = 
+        selectedSort === "oldest"
+            ? { createdAt: "asc" as const }
+            : selectedSort === "company-asc"
+                ? { company: "asc" as const}
+                : selectedSort === "company-desc"
+                    ? { company: "desc" as const }
+                    : { createdAt: "desc" as const };
+
     const [jobs, totalCount, interviewCount, offerCount, rejectedCount] = 
         await Promise.all([
             prisma.jobApplication.findMany({
-                where: selectedStatus
-                    ? { 
-                        status: selectedStatus,  // select * where status 
-                    } 
-                    : undefined,    // select * 
-                orderBy: {
-                    createdAt: "desc",
+                where: {
+                    ...(selectedStatus
+                        ? { 
+                            status: selectedStatus,  // select * where status 
+                        } 
+                        : {}),    // select *
+                        
+                    ...(search
+                        ? {
+                            OR: [   // job matches when the search appears in company or position
+                                {
+                                    company: {
+                                        contains: search,
+                                        mode: "insensitive" as const,
+                                    },
+                                },
+                                {
+                                    position: {
+                                        contains: search,
+                                        mode: "insensitive" as const,
+                                    },
+                                },
+                            ],
+                        }
+                        : {}),
                 },
+                orderBy,
             }),
 
             prisma.jobApplication.count(),
@@ -60,10 +104,22 @@ export default async function Home({ searchParams, }: { searchParams: Promise<{ 
 
             <h2 className="text-2xl font-semibold mb-4">Job Applications</h2>
 
-            <StatusFilter currentStatus={selectedStatus} />
+            <JobSearchControls
+                currentSearch={search}
+                currentSort={selectedSort}
+                currentStatus={selectedStatus}
+            />
+
+            <StatusFilter 
+                currentStatus={selectedStatus}
+                currentSearch={search}
+                currentSort={selectedSort}
+            />
 
             {jobs.length === 0 ? (
-                <p>No job applications yet.</p>
+                <p className="rounded-lg border p-6 text-center text-zinc-600">
+                    No job applications match the selected filters.
+                </p>
             ) : (
                 <div className="space-y-4">
                     {jobs.map((job: Job) => (
