@@ -11,6 +11,10 @@ import { JOB_SORT_OPTIONS } from "@/lib/constants/jobConstants";
 import { jobStatusSchema } from "@/lib/validation/jobSchemas";
 import type { Job, JobSortOption } from "@/lib/types/jobTypes";
 
+import { auth } from "@/auth";
+import SignInButton from "./components/SignInButton";
+import SignOutButton from "./components/SignOutButton";
+
 type HomeSearchParams = {
     status?: string;
     search?: string;
@@ -18,6 +22,8 @@ type HomeSearchParams = {
 };
 
 export default async function Home({ searchParams, }: { searchParams: Promise<HomeSearchParams>;}) {
+    const session = await auth();
+
     const params = await searchParams;
 
     const statusResult = jobStatusSchema.safeParse(params.status);
@@ -91,7 +97,24 @@ export default async function Home({ searchParams, }: { searchParams: Promise<Ho
 
     return (
         <main className="max-w-4xl mx-auto p-8">
-            <h1 className="text-4xl font-bold mb-8">ApplyTrackr</h1>
+            <header className="mb-8 flex items-center justify-between">
+                <div>
+                    <h1 className="text-4xl font-bold">ApplyTrackr</h1>
+
+                    {session?.user && (
+                        <p className="mt-1 text-sm text-zinc-600">
+                            Signed in as {session.user.name ?? session.user.email}
+                        </p>
+                    )}
+                </div>
+
+                {session?.user ? (
+                    <SignOutButton />
+                ) : (
+                    <SignInButton />
+                )}
+            </header>
+            
 
             <DashboardStats 
                 total={totalCount}
