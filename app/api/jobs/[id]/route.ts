@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { updateJobRequestSchema, updateStatusRequestSchema } from "@/lib/validation/jobSchemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { auth } from "@/auth";
 
 type RouteParams = {
     params: Promise<{
@@ -11,11 +12,30 @@ type RouteParams = {
 
 export async function DELETE(_request: Request, { params }: RouteParams) {
     try {
+        const session = await auth();
+
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const { id } = await params;
 
-        await prisma.jobApplication.delete({
-            where: { id },
+        const result = await prisma.jobApplication.deleteMany({
+            where: { 
+                id,
+                userId: session.user.id,
+            },
         });
+
+        if (result.count === 0) {
+            return NextResponse.json(
+                { error: "Job application not found" },
+                { status: 404 }
+            );
+        }
 
         return NextResponse.json({ message: "Job application deleted", });
     } catch (error) {
@@ -30,8 +50,32 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
     try {
+        const session = await auth();
+
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const { id } = await params;
         const body: unknown = await request.json();
+
+        const existingJob = await prisma.jobApplication.findFirst({
+            // confirm that the record belongs to the current user
+            where: {
+                id,
+                userId: session.user.id,
+            },
+        });
+
+        if (!existingJob) {
+            return NextResponse.json(
+                { error: "Job application not found" },
+                { status: 404 }
+            );
+        }
 
         // The status dropdown sends only { status }.
         const statusResult = updateStatusRequestSchema.safeParse(body);

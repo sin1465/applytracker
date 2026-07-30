@@ -2,10 +2,24 @@ import { prisma } from "@/lib/prisma";
 import { createJobSchema } from "@/lib/validation/jobSchemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { auth } from "@/auth";
+import { error } from "console";
 
 export async function GET() {
     try {
+        const session = await auth();
+
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const jobs = await prisma.jobApplication.findMany({
+            where: {
+                userId: session.user.id,
+            },
             orderBy: {
                 createdAt: "desc",  // newest jobs appear first
             },
@@ -24,6 +38,15 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await auth();
+
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
         const body: unknown = await request.json();
         const result = createJobSchema.safeParse(body);
 
@@ -48,6 +71,8 @@ export async function POST(request: Request) {
                 jobUrl: data.jobUrl || null,
                 notes: data.notes || null,
                 status: data.status ?? "SAVED",
+
+                userId: session.user.id, // assign ownership
             },
         });
 

@@ -24,6 +24,26 @@ type HomeSearchParams = {
 export default async function Home({ searchParams, }: { searchParams: Promise<HomeSearchParams>;}) {
     const session = await auth();
 
+    if (!session?.user) {
+        return (
+            <main className="mx-auto flex min-h-screen max-w-4xl items-center justify-center p-8">
+                <section className="rounded-lg border bg-white p-8 text-center shadow-sm">
+                    <h1 className="mb-3 text-4xl font-bold">
+                        ApplyTrackr
+                    </h1>
+
+                    <p className="mb-6 text-zinc-600">
+                        Sign in to manage your job applications.
+                    </p>
+
+                    <SignInButton />
+                </section>
+            </main>
+        );
+    }
+
+    const userId = session.user.id;
+
     const params = await searchParams;
 
     const statusResult = jobStatusSchema.safeParse(params.status);
@@ -52,6 +72,8 @@ export default async function Home({ searchParams, }: { searchParams: Promise<Ho
         await Promise.all([
             prisma.jobApplication.findMany({
                 where: {
+                    userId,
+
                     ...(selectedStatus
                         ? { 
                             status: selectedStatus,  // select * where status 
@@ -80,18 +102,31 @@ export default async function Home({ searchParams, }: { searchParams: Promise<Ho
                 orderBy,
             }),
 
-            prisma.jobApplication.count(),
-
             prisma.jobApplication.count({
-                where: { status: "INTERVIEW" },
+                where: {
+                    userId,
+                },
             }),
 
             prisma.jobApplication.count({
-                where: { status: "OFFER" },
+                where: { 
+                    userId,
+                    status: "INTERVIEW", 
+                },
             }),
 
             prisma.jobApplication.count({
-                where: { status: "REJECTED" },
+                where: { 
+                    userId,
+                    status: "OFFER", 
+                },
+            }),
+
+            prisma.jobApplication.count({
+                where: { 
+                    userId,
+                    status: "REJECTED",
+                },
             }),
         ]);
 
