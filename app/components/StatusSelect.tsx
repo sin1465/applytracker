@@ -34,9 +34,10 @@ export default function StatusSelect({ id, status }: StatusSelectProps) {
 
     return (
         <select
+            id={`status-select-${id}`}
             value={status}
             onChange={handleChange}
-            className="mt-3 rounded border p-2"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm sm:w-auto"
         >
             {JOB_STATUSES.map((statusOption) => (
                 <option key={statusOption} value={statusOption}>

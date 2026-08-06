@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import AddJobForm from "./components/AddJobForm";
-import EditJobForm from "./components/EditJobForm";
-import DeleteJobButton from "./components/DeleteJobButton";
-import StatusSelect from "./components/StatusSelect";
 import StatusFilter from "./components/StatusFilter";
 import DashboardStats from "./components/DashboardStats";
 import JobSearchControls from "./components/JobSearchControls";
+import JobCard from "./components/JobCard";
 
 import { JOB_SORT_OPTIONS } from "@/lib/constants/jobConstants";
 import { jobStatusSchema } from "@/lib/validation/jobSchemas";
@@ -131,86 +129,87 @@ export default async function Home({ searchParams, }: { searchParams: Promise<Ho
         ]);
 
     return (
-        <main className="max-w-4xl mx-auto p-8">
-            <header className="mb-8 flex items-center justify-between">
-                <div>
-                    <h1 className="text-4xl font-bold">ApplyTrackr</h1>
+        <div className="min-h-screen bg-zinc-50">
+            <header className="border-b border-zinc-200 bg-white">
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
+                            ApplyTrackr
+                        </h1>
 
-                    {session?.user && (
                         <p className="mt-1 text-sm text-zinc-600">
-                            Signed in as {session.user.name ?? session.user.email}
+                            Signed in as {" "}
+                            {session.user.name ?? session.user.email ?? "User"}
                         </p>
-                    )}
-                </div>
-
-                {session?.user ? (
+                    </div>
+                    
                     <SignOutButton />
-                ) : (
-                    <SignInButton />
-                )}
+                </div>
             </header>
             
+            <main className="mx-auto max-w-6xl px-6 py-8">
+                <section className="mb-10">
+                    <h2 className="text-3xl font-bold tracking-tight text-zinc-900">
+                        Dashboard
+                    </h2>
 
-            <DashboardStats 
-                total={totalCount}
-                interviews={interviewCount}
-                offers={offerCount}
-                rejected={rejectedCount}
-            />
+                    <p className="mt-2 text-zinc-600">
+                        Track your applications, interviews, and offers.
+                    </p>
+                </section>
 
-            <AddJobForm />
+                <DashboardStats 
+                    total={totalCount}
+                    interviews={interviewCount}
+                    offers={offerCount}
+                    rejected={rejectedCount}
+                />
 
-            <h2 className="text-2xl font-semibold mb-4">Job Applications</h2>
+                <AddJobForm />
 
-            <JobSearchControls
-                currentSearch={search}
-                currentSort={selectedSort}
-                currentStatus={selectedStatus}
-            />
+                <section className="mt-10">
+                    <div className="mb-5">
+                        <h2 className="text-2xl font-semibold text-zinc-900">
+                            Job Applications
+                        </h2>
 
-            <StatusFilter 
-                currentStatus={selectedStatus}
-                currentSearch={search}
-                currentSort={selectedSort}
-            />
+                        <p>
+                            {jobs.length} application
+                            {jobs.length === 1 ? "" : "s"} shown
+                        </p>
+                    </div>
 
-            {jobs.length === 0 ? (
-                <p className="rounded-lg border p-6 text-center text-zinc-600">
-                    No job applications match the selected filters.
-                </p>
-            ) : (
-                <div className="space-y-4">
-                    {jobs.map((job: Job) => (
-                        <div key={job.id} className="border rounded-lg p-4 shadow-sm">
-                            <h3 className="font-bold text-lg">{job.position}</h3>
-                            <p>{job.company}</p>
-                            <p>{job.location ?? "No location specified"}</p>
+                    <JobSearchControls
+                        currentSearch={search}
+                        currentSort={selectedSort}
+                        currentStatus={selectedStatus}
+                    />
 
-                            {job.salary && <p>Salary: {job.salary}</p>}
+                    <StatusFilter 
+                        currentStatus={selectedStatus}
+                        currentSearch={search}
+                        currentSort={selectedSort}
+                    />
 
-                            {job.jobUrl && (
-                                <a
-                                    href={job.jobUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 underline"
-                                >
-                                    View job posting
-                                </a>
-                            )}
+                    {jobs.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
+                            <h3 className="text-lg font-semibold text-zinc-900">
+                                No applications found
+                            </h3>
 
-                            {job.notes && <p className="mt-2">{job.notes}</p>}
-
-                            <StatusSelect id={job.id} status={job.status} />
-
-                            <div className="flex gap-2">
-                                <EditJobForm job={job} />
-                                <DeleteJobButton id={job.id} />
-                            </div>
+                            <p className="mt-2 text-sm text-zinc-600">
+                                Add a new application or change your search and filter options.
+                            </p>
                         </div>
-                    ))}
-                </div>
-            )}
-        </main>
+                    ) : (
+                        <div className="grid gap-5">
+                            {jobs.map((job) => (
+                                <JobCard key={job.id} job={job} />
+                            ))}
+                        </div>
+                    )}
+                </section>
+            </main>            
+        </div>
     );
 }
