@@ -99,7 +99,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
             <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="mt-3 rounded border px-3 py-1 text-sm"
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100"
             >
                 Edit
             </button>
@@ -109,129 +109,142 @@ export default function EditJobForm({ job }: EditJobFormProps) {
     return (
         <form
             onSubmit={handleSubmit}
-            className="mt-4 space-y-4 rounded-lg border bg-zinc-50 p-4"
+            className="mt-5 rounded-xl border border-zinc-200 bg-zinc-50 p-5"
         >
-            <h4 className="font-semibold">Edit Job Application</h4>
+            <div className="mb-5">
+                <h4 className="text-lg font-semibold text-zinc-900">
+                    Edit Job Application
+                </h4>
+
+                <p className="mt-1 text-sm text-zinc-600">
+                    Update the saved details for this application.
+                </p>
+            </div>
 
             {formError && (
-                <p role="alert" className="text-sm text-red-600">
+                <div
+                    role="alert"
+                    className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                >
                     {formError}
-                </p>
+                </div>
             )}
 
-            <div>
-                <label htmlFor={`company-${job.id}`} className="block text-sm">
-                    Company
-                </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label htmlFor={`company-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
+                        Company
+                    </label>
 
-                <input
-                    id={`company-${job.id}`}
-                    value={company}
-                    onChange={(event) => setCompany(event.target.value)}
-                    className="w-full rounded border p-2"
-                    disabled={isSubmitting}
-                />
+                    <input
+                        id={`company-${job.id}`}
+                        value={company}
+                        onChange={(event) => setCompany(event.target.value)}
+                        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
+                        disabled={isSubmitting}
+                    />
 
-                {fieldErrors.company?.map((message) => (
-                    <p key={message} className="text-sm text-red-600">
-                        {message}
-                    </p>
-                ))}
-            </div>
-
-            <div>
-                <label htmlFor={`position-${job.id}`} className="block text-sm">
-                    Position
-                </label>
-
-                <input
-                    id={`position-${job.id}`}
-                    value={position}
-                    onChange={(event) => setPosition(event.target.value)}
-                    className="w-full rounded border p-2"
-                    disabled={isSubmitting}
-                />
-
-                {fieldErrors.position?.map((message) => (
-                    <p key={message} className="text-sm text-red-600">
-                        {message}
-                    </p>
-                ))}
-            </div>
-
-            <div>
-                <label htmlFor={`location-${job.id}`} className="block text-sm">
-                    Location
-                </label>
-
-                <input
-                    id={`location-${job.id}`}
-                    value={location}
-                    onChange={(event) => setLocation(event.target.value)}
-                    className="w-full rounded border p-2"
-                    disabled={isSubmitting}
-                />
-            </div>
-
-            <div>
-                <label htmlFor={`salary-${job.id}`} className="block text-sm">
-                    Salary
-                </label>
-
-                <input
-                    id={`salary-${job.id}`}
-                    value={salary}
-                    onChange={(event) => setSalary(event.target.value)}
-                    className="w-full rounded border p-2"
-                    disabled={isSubmitting}
-                />
-            </div>
-
-            <div>
-                <label htmlFor={`job-url-${job.id}`} className="block text-sm">
-                    Job URL
-                </label>
-
-                <input
-                    id={`job-url-${job.id}`}
-                    type="url"
-                    value={jobUrl}
-                    onChange={(event) => setJobUrl(event.target.value)}
-                    className="w-full rounded border p-2"
-                    disabled={isSubmitting}
-                />
-
-                {fieldErrors.jobUrl?.map((message) => (
-                    <p key={message} className="text-sm text-red-600">
-                        {message}
-                    </p>
-                ))}
-            </div>
-
-            <div>
-                <label htmlFor={`status-${job.id}`} className="block text-sm">
-                    Status
-                </label>
-
-                <select
-                    id={`status-${job.id}`}
-                    value={status}
-                    onChange={(event) =>
-                        setStatus(event.target.value as JobStatus)
-                    }
-                    className="w-full rounded border p-2"
-                    disabled={isSubmitting}
-                >
-                    {JOB_STATUSES.map((statusOption) => (
-                        <option key={statusOption} value={statusOption}>
-                            {statusOption}
-                        </option>
+                    {fieldErrors.company?.map((message) => (
+                        <p key={message} className="mt-1 text-sm text-red-600">
+                            {message}
+                        </p>
                     ))}
-                </select>
+                </div>
+
+                <div>
+                    <label htmlFor={`position-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
+                        Position
+                    </label>
+
+                    <input
+                        id={`position-${job.id}`}
+                        value={position}
+                        onChange={(event) => setPosition(event.target.value)}
+                        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
+                        disabled={isSubmitting}
+                    />
+
+                    {fieldErrors.position?.map((message) => (
+                        <p key={message} className="mt-1 text-sm text-red-600">
+                            {message}
+                        </p>
+                    ))}
+                </div>
+
+                <div>
+                    <label htmlFor={`location-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
+                        Location
+                    </label>
+
+                    <input
+                        id={`location-${job.id}`}
+                        value={location}
+                        onChange={(event) => setLocation(event.target.value)}
+                        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
+                        disabled={isSubmitting}
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor={`salary-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
+                        Salary
+                    </label>
+
+                    <input
+                        id={`salary-${job.id}`}
+                        value={salary}
+                        onChange={(event) => setSalary(event.target.value)}
+                        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
+                        disabled={isSubmitting}
+                    />
+                </div>
+
+                <div className="sm:col-span-2">
+                    <label htmlFor={`job-url-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
+                        Job URL
+                    </label>
+
+                    <input
+                        id={`job-url-${job.id}`}
+                        type="url"
+                        value={jobUrl}
+                        onChange={(event) => setJobUrl(event.target.value)}
+                        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
+                        disabled={isSubmitting}
+                    />
+
+                    {fieldErrors.jobUrl?.map((message) => (
+                        <p key={message} className="text-sm text-red-600">
+                            {message}
+                        </p>
+                    ))}
+                </div>
+
+                <div>
+                    <label htmlFor={`status-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
+                        Status
+                    </label>
+
+                    <select
+                        id={`status-${job.id}`}
+                        value={status}
+                        onChange={(event) =>
+                            setStatus(event.target.value as JobStatus)
+                        }
+                        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
+                        disabled={isSubmitting}
+                    >
+                        {JOB_STATUSES.map((statusOption) => (
+                            <option key={statusOption} value={statusOption}>
+                                {statusOption}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
-            <div>
-                <label htmlFor={`notes-${job.id}`} className="block text-sm">
+            <div className="mt-4">
+                <label htmlFor={`notes-${job.id}`} className="mb-1.5 block text-sm font-medium text-zinc-700">
                     Notes
                 </label>
 
@@ -240,7 +253,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
                     rows={4}
-                    className="w-full rounded border p-2"
+                    className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:bg-zinc-100"
                     disabled={isSubmitting}
                 />
             </div>
@@ -249,7 +262,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
+                    className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
@@ -258,7 +271,7 @@ export default function EditJobForm({ job }: EditJobFormProps) {
                     type="button"
                     onClick={cancelEditing}
                     disabled={isSubmitting}
-                    className="rounded border px-3 py-2 text-sm"
+                    className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:opacity-50"
                 >
                     Cancel
                 </button>
