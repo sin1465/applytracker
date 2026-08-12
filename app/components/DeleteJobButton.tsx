@@ -50,7 +50,7 @@ export default function DeleteJobButton({ id }: DeleteJobButtonProps) {
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="mt-3 rounded bg-red-600 px-3 py-1 text-sm text-white disabled:opacity-50"
+                className="rounded-lg bg-red-600 px-3 py-2 text-sm text-white disabled:opacity-50"
             >
                 {isDeleting ? "Deleting..." : "Delete"}
             </button>

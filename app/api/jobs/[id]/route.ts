@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { updateJobRequestSchema, updateStatusRequestSchema } from "@/lib/validation/jobSchemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { getCurrentUserId } from "@/lib/auth/getCurrentUserId";
 
 type RouteParams = {
     params: Promise<{
@@ -12,9 +12,9 @@ type RouteParams = {
 
 export async function DELETE(_request: Request, { params }: RouteParams) {
     try {
-        const session = await auth();
+        const userId = await getCurrentUserId();
 
-        if (!session?.user) {
+        if (!userId) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -26,7 +26,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
         const result = await prisma.jobApplication.deleteMany({
             where: { 
                 id,
-                userId: session.user.id,
+                userId: userId,
             },
         });
 
@@ -50,9 +50,9 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
 export async function PATCH(request: Request, { params }: RouteParams) {
     try {
-        const session = await auth();
+        const userId = await getCurrentUserId();
 
-        if (!session?.user) {
+        if (!userId) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 401 }
@@ -66,7 +66,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
             // confirm that the record belongs to the current user
             where: {
                 id,
-                userId: session.user.id,
+                userId: userId,
             },
         });
 
