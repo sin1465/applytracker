@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ApplyTracker
 
-## Getting Started
+ApplyTracker is a full-stack job application tracker built with Next.js, TypeScript, PostgreSQL, and Prisma. It allows users to securely track and manage their job applications through a responsive dashboard.
 
-First, run the development server:
+**Live Demo:** [ApplyTracker] https://applytracker-kappa.vercel.app/
+
+## Features
+
+- GitHub OAuth authentication
+- User-specific job application tracking
+- Create, edit, and delete applications
+- Track application status: Saved, Applied, Interview, Offer, and Rejected
+- Search, filter, and sort applications
+- Dashboard statistics
+- Server-side validation with Zod
+- Responsive interface
+- Protected API routes and per-user data ownership
+
+## Tech Stack
+
+**Frontend:** Next.js, React, TypeScript, Tailwind CSS  
+**Backend:** Next.js Route Handlers, Auth.js, Zod  
+**Database:** PostgreSQL, Neon, Prisma ORM  
+**Testing:** Vitest, React Testing Library, Playwright  
+**Deployment:** Vercel
+
+## Testing
+
+The project uses multiple levels of automated testing:
+
+- **Vitest** — unit and API tests
+- **React Testing Library** — component and user-interaction tests
+- **Playwright** — end-to-end browser and API tests
+
+Run unit/component tests:
+
+```bash
+npm run test:run
+```
+
+Run end-to-end tests:
+
+```bash
+npm run test:e2e
+```
+
+## Running Locally
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/sin1465/applytracker
+cd applytrackr
+npm install
+```
+
+Create an environment file with:
+
+```env
+DATABASE_URL="your-database-url"
+AUTH_SECRET="your-auth-secret"
+AUTH_GITHUB_ID="your-github-client-id"
+AUTH_GITHUB_SECRET="your-github-client-secret"
+```
+
+Generate Prisma Client and apply migrations:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+Start the application:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+app/
+├── api/            # API route handlers
+├── components/     # React components
+└── page.tsx        # Dashboard
 
-## Learn More
+lib/
+├── auth/           # Authentication helpers
+├── constants/      # Shared constants
+├── types/          # TypeScript types
+├── validation/     # Zod schemas
+└── prisma.ts       # Prisma client
 
-To learn more about Next.js, take a look at the following resources:
+prisma/             # Database schema and migrations
+e2e/                # Playwright tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What I Learned
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Building ApplyTracker gave me hands-on experience with the complete full-stack development lifecycle, including relational database design, API development, OAuth authentication, authorization, server-side validation, automated testing, and production deployment.
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is available for educational and portfolio purposes.
